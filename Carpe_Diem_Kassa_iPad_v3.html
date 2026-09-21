@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Carpe Dièm Streetfood Kassa</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080a0b;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.app{position:absolute;inset:8px 8px 70px 8px;display:flex;gap:10px}
+.products{width:61%;height:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));gap:7px;overflow:auto}
+.p{appearance:none;-webkit-appearance:none;background:#111416;color:#fff;border:1px solid #555;border-radius:8px;padding:5px;min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-weight:700;font-size:16px;line-height:1.15;touch-action:manipulation}
+.p small{font-size:15px;margin-top:5px}.food{font-size:18px}.drink{font-size:15px}
+.order{width:39%;height:100%;background:#0e1112;border:1px solid #444;border-radius:10px;padding:10px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+#lines{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+.line{display:grid;grid-template-columns:minmax(0,1fr) 36px 24px 36px 36px;gap:5px;align-items:center;border-bottom:1px solid #303436;padding:7px 0;font-size:14px}
+.name{min-width:0}.name small{display:block;color:#ddd;margin-top:3px}
+.btn{appearance:none;-webkit-appearance:none;border:0;border-radius:6px;background:#303538;color:#fff;font-size:20px;height:36px;padding:0}.trash{font-size:16px}
+.totals{flex:none;border-top:1px solid #555;padding-top:7px;font-size:16px}.row{display:flex;justify-content:space-between;margin:3px 0}.total{font-size:25px;font-weight:800;border-top:1px solid #aaa;padding-top:6px;margin-top:6px}
+.pay{width:100%;height:52px;border:0;border-radius:7px;margin-top:7px;font-size:22px;font-weight:800;color:#fff}.pin{background:#11b968}.cash{background:#e9a916}
+.bottom{position:absolute;left:8px;right:8px;bottom:8px;height:54px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.bottom button{appearance:none;-webkit-appearance:none;background:#171b1d;border:1px solid #34393c;border-radius:8px;color:#fff;font-size:15px}
+@media(max-width:850px){.products{width:60%}.order{width:40%}.p{font-size:13px}.food{font-size:15px}.pay{height:46px}.total{font-size:22px}}
+</style></head>
+<body>
+<div class="app">
+<section class="products" id="products">
+<button class="p food" onclick="add(0)">Wrap met kip<small>€ 7,50</small></button>
+<button class="p food" onclick="add(1)">Wrap met rundvlees<small>€ 9,50</small></button>
+<button class="p food" onclick="add(2)">Wrap falafel<small>€ 7,50</small></button>
+<button class="p food" onclick="add(3)">Wrap çiğköfte<small>€ 5,50</small></button>
+<button class="p food" onclick="add(4)">Çiğköfte los (10 stuks)<small>€ 9,50</small></button>
+<button class="p food" onclick="add(5)">Linzensoep (300 ml)<small>€ 4,50</small></button>
+<button class="p drink" onclick="add(6)">Thee<small>€ 2,00</small></button>
+<button class="p drink" onclick="add(7)">Ayran<small>€ 2,00</small></button>
+<button class="p drink" onclick="add(8)">Coca-Cola<small>€ 2,50</small></button>
+<button class="p drink" onclick="add(9)">Coca-Cola Zero<small>€ 2,50</small></button>
+<button class="p drink" onclick="add(10)">Ice tea Green<small>€ 2,50</small></button>
+<button class="p drink" onclick="add(11)">Ice tea Peach<small>€ 2,50</small></button>
+<button class="p drink" onclick="add(12)">Spa blauw<small>€ 2,50</small></button>
+<button class="p drink" onclick="add(13)">Spa rood<small>€ 2,50</small></button>
+<button class="p drink" onclick="add(14)">Redbull<small>€ 3,50</small></button>
+<button class="p drink" onclick="add(15)">Capri Sun<small>€ 1,50</small></button>
+</section>
+<aside class="order">
+<div id="lines"></div>
+<div class="totals">
+<div class="row"><span>Subtotaal</span><b id="sub">€ 0,00</b></div>
+<div class="row"><span>BTW (9%)</span><span id="vat">€ 0,00</span></div>
+<div class="row total"><span>Totaal</span><span id="total">€ 0,00</span></div>
+<button class="pay pin" onclick="pay('PIN')">▣ &nbsp; PIN</button>
+<button class="pay cash" onclick="pay('CONTANT')">▣ &nbsp; CONTANT</button>
+</div></aside></div>
+<div class="bottom">
+<button onclick="discount()">🏷 Korting %</button><button onclick="clearCart()">🗑 Wis alles</button>
+<button onclick="window.print()">▣ Bon printen</button><button onclick="showSales()">••• Overig</button>
+</div>
+<script>
+const products=[
+["Wrap met kip",7.50,"food"],["Wrap met rundvlees",9.50,"food"],["Wrap falafel",7.50,"food"],
+["Wrap çiğköfte",5.50,"food"],["Çiğköfte los (10 stuks)",9.50,"food"],["Linzensoep (300 ml)",4.50,"food"],
+["Thee",2],["Ayran",2],["Coca-Cola",2.50],["Coca-Cola Zero",2.50],["Ice tea Green",2.50],
+["Ice tea Peach",2.50],["Spa blauw",2.50],["Spa rood",2.50],["Redbull",3.50],["Capri Sun",1.50]
+];
+let cart={}, disc=0;
+const euro=n=>"€ "+n.toFixed(2).replace(".",",");
+
+function add(i){cart[i]=(cart[i]||0)+1;render()}
+function qty(i,d){cart[i]+=d;if(cart[i]<=0)delete cart[i];render()}
+function del(i){delete cart[i];render()}
+function rawTotal(){return Object.entries(cart).reduce((s,[i,q])=>s+products[i][1]*q,0)}
+function finalTotal(){return rawTotal()*(1-disc/100)}
+function render(){
+ let L=document.getElementById("lines");L.innerHTML="";
+ Object.entries(cart).forEach(([i,q])=>{let p=products[i],d=document.createElement("div");d.className="line";d.innerHTML=`<div class="name">${p[0]}<small>${euro(p[1])}</small></div><button class="btn" onclick="qty(${i},-1)">−</button><b>${q}</b><button class="btn" onclick="qty(${i},1)">+</button><button class="btn trash" onclick="del(${i})">🗑</button>`;L.appendChild(d)});
+ let t=finalTotal();document.getElementById("sub").textContent=euro(t/1.09);document.getElementById("vat").textContent=euro(t-t/1.09);document.getElementById("total").textContent=euro(t)
+}
+function clearCart(){if(Object.keys(cart).length && confirm("Bestelling wissen?")){cart={};disc=0;render()}}
+function discount(){let x=prompt("Kortingspercentage:",disc||"");if(x!==null){x=Number(String(x).replace(",","."));if(x>=0&&x<=100){disc=x;render()}}}
+function pay(method){
+ if(!Object.keys(cart).length)return alert("Nog geen producten gekozen.");
+ let sale={time:new Date().toISOString(),method,total:finalTotal(),discount:disc,items:Object.entries(cart).map(([i,q])=>({name:products[i][0],price:products[i][1],qty:q}))};
+ let sales=JSON.parse(localStorage.getItem("cd_sales")||"[]");sales.push(sale);localStorage.setItem("cd_sales",JSON.stringify(sales));
+ alert(method+" geregistreerd: "+euro(sale.total));cart={};disc=0;render()
+}
+function showSales(){let s=JSON.parse(localStorage.getItem("cd_sales")||"[]"),today=new Date().toISOString().slice(0,10),d=s.filter(x=>x.time.slice(0,10)==today),t=d.reduce((a,x)=>a+x.total,0);alert("Vandaag: "+d.length+" transacties\\nOmzet: "+euro(t))}
+render();
+</script></body></html>
