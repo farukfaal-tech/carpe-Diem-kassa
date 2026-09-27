@@ -51,6 +51,5 @@ function drawManage(){manage.innerHTML="";products.forEach((p,i)=>{let r=documen
 function readManage(){document.querySelectorAll("#manage [data-i]").forEach(e=>{let i=+e.dataset.i,k=e.dataset.k,v=e.value;if(k=="price"||k=="deposit")v=Number(String(v).replace(",","."))||0;products[i][k]=v})}
 function addProduct(){readManage();products.push({name:"Nieuw product",price:0,deposit:0,pic:"🍴",img:""});drawManage()}function removeProduct(i){if(confirm("Product verwijderen?")){readManage();products.splice(i,1);drawManage()}}
 function saveProducts(){readManage();localStorage.setItem("cd_products",JSON.stringify(products.map(({img,...x})=>x)));cart={};drawProducts();render();closeManage();alert("Producten opgeslagen.")}
-drawProducts();render();closeManage();alert("Producten opgeslagen.")}
 drawProducts();render();
 </script></body></html>
